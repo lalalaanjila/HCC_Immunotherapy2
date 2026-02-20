@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 # =========================
 # 0. 基本配置
 # =========================
-st.set_page_config(page_title="HCC 疗效预测（临床+3D DL联合模型）", layout="wide")
+# st.set_page_config(page_title="HCC 疗效预测（临床+3D DL联合模型）", layout="wide")
 
 MODEL_PATH = "DL_Clinical_XGBoost.pkl"
 DATA_PATH = "HCC_DL_clinical.csv"   # 用于读取 min/max/median，便于输入默认值
@@ -197,3 +197,4 @@ if st.button("点击进行预测"):
 
 
     st.image("shap_waterfall_dl_clinical.png", caption="当前患者的 SHAP waterfall plot（对 P(group=1) 的贡献）")
+
