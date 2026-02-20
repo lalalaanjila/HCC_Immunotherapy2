@@ -66,82 +66,85 @@ st.markdown("""
 
 st.subheader("1. 输入变量")
 
-# 分栏：左侧临床，右侧DL特征
-col_left, col_right = st.columns(2)
-
 input_values = {}
 
-# -------- 临床变量（5）--------
-with col_left:
-    st.markdown("### （1）临床变量")
+# =========================
+# （1）临床变量 —— 放在上面
+# =========================
+st.markdown("### （1）临床变量")
 
-    # Alcohol
-    if "Alcohol" in feature_names:
-        if is_binary_01(data["Alcohol"]):
-            input_values["Alcohol"] = st.selectbox(
-                "Alcohol（饮酒史：0=无 / 1=有）",
-                options=[0, 1],
-                format_func=lambda x: "0 = 无饮酒史" if x == 0 else "1 = 有饮酒史",
-            )
-        else:
-            input_values["Alcohol"] = st.number_input(
-                "Alcohol（数值编码）",
-                min_value=float(stats.loc["min", "Alcohol"]),
-                max_value=float(stats.loc["max", "Alcohol"]),
-                value=float(stats.loc["median", "Alcohol"]),
-                step=1.0,
-            )
+# Alcohol
+if "Alcohol" in feature_names:
+    if is_binary_01(data["Alcohol"]):
+        input_values["Alcohol"] = st.selectbox(
+            "Alcohol（饮酒史：0=无 / 1=有）",
+            options=[0, 1],
+            format_func=lambda x: "0 = 无饮酒史" if x == 0 else "1 = 有饮酒史",
+        )
+    else:
+        input_values["Alcohol"] = st.number_input(
+            "Alcohol（数值编码）",
+            min_value=float(stats.loc["min", "Alcohol"]),
+            max_value=float(stats.loc["max", "Alcohol"]),
+            value=float(stats.loc["median", "Alcohol"]),
+            step=1.0,
+        )
 
-    # AFP
-    input_values["AFP"] = st.number_input(
-        "AFP（ng/mL）",
-        min_value=float(stats.loc["min", "AFP"]),
-        max_value=float(stats.loc["max", "AFP"]),
-        value=float(stats.loc["median", "AFP"]),
-        step=1.0,
+# AFP
+input_values["AFP"] = st.number_input(
+    "AFP（ng/mL）",
+    min_value=float(stats.loc["min", "AFP"]),
+    max_value=float(stats.loc["max", "AFP"]),
+    value=float(stats.loc["median", "AFP"]),
+    step=1.0,
+)
+
+# AST_ALT
+if is_binary_01(data["AST_ALT"]):
+    input_values["AST_ALT"] = st.selectbox(
+        "AST_ALT（0=低 / 1=高；按截断后的变量）",
+        options=[0, 1],
+    )
+else:
+    input_values["AST_ALT"] = st.number_input(
+        "AST/ALT（比值）",
+        min_value=float(stats.loc["min", "AST_ALT"]),
+        max_value=float(stats.loc["max", "AST_ALT"]),
+        value=float(stats.loc["median", "AST_ALT"]),
+        step=0.01,
+        format="%.4f",
     )
 
-    # AST_ALT
-    if is_binary_01(data["AST_ALT"]):
-        input_values["AST_ALT"] = st.selectbox(
-            "AST_ALT（0=低 / 1=高；按截断后的变量）",
-            options=[0, 1],
-        )
-    else:
-        input_values["AST_ALT"] = st.number_input(
-            "AST/ALT（比值）",
-            min_value=float(stats.loc["min", "AST_ALT"]),
-            max_value=float(stats.loc["max", "AST_ALT"]),
-            value=float(stats.loc["median", "AST_ALT"]),
-            step=0.01,
-            format="%.4f",
-        )
+# Ascites
+if is_binary_01(data["Ascites"]):
+    input_values["Ascites"] = st.selectbox("Ascites（腹水：0=无 / 1=有）", options=[0, 1])
+else:
+    asc_opts = sorted(pd.Series(data["Ascites"].dropna().unique()).tolist())
+    input_values["Ascites"] = st.selectbox("Ascites（腹水分级/编码）", options=asc_opts)
 
-    # Ascites
-    if is_binary_01(data["Ascites"]):
-        input_values["Ascites"] = st.selectbox("Ascites（腹水：0=无 / 1=有）", options=[0, 1])
-    else:
-        asc_opts = sorted(pd.Series(data["Ascites"].dropna().unique()).tolist())
-        input_values["Ascites"] = st.selectbox("Ascites（腹水分级/编码）", options=asc_opts)
+# ECOG_PS
+ecog_opts = sorted(pd.Series(data["ECOG_PS"].dropna().unique()).tolist())
+input_values["ECOG_PS"] = st.selectbox("ECOG-PS", options=ecog_opts)
 
-    # ECOG_PS
-    ecog_opts = sorted(pd.Series(data["ECOG_PS"].dropna().unique()).tolist())
-    input_values["ECOG_PS"] = st.selectbox("ECOG-PS", options=ecog_opts)
+# 分隔线：让（2）出现在（1）下面
+st.markdown("---")
 
-# -------- 3D DL PCA 特征（15）--------
-with col_right:
-    st.markdown("### （2）3D DL 特征（PCA 主成分）")
-    dl_cols = [c for c in feature_names if c.startswith("AP_PC") or c.startswith("VP_PC")]
+# =========================
+# （2）3D DL 特征 —— 放在下面
+# =========================
+st.markdown("### （2）3D DL 特征（PCA 主成分）")
 
-    for col in dl_cols:
-        input_values[col] = st.number_input(
-            label=f"{col}",
-            min_value=float(stats.loc["min", col]),
-            max_value=float(stats.loc["max", col]),
-            value=float(stats.loc["median", col]),
-            step=0.01,
-            format="%.4f",
-        )
+dl_cols = [c for c in feature_names if c.startswith("AP_PC") or c.startswith("VP_PC")]
+
+for col in dl_cols:
+    input_values[col] = st.number_input(
+        label=f"{col}",
+        min_value=float(stats.loc["min", col]),
+        max_value=float(stats.loc["max", col]),
+        value=float(stats.loc["median", col]),
+        step=0.01,
+        format="%.4f",
+    )
 
 # 组装模型输入
 features_df = pd.DataFrame([[input_values[c] for c in feature_names]], columns=feature_names)
@@ -191,5 +194,6 @@ if st.button("点击进行预测"):
         plt.tight_layout()
         plt.savefig("shap_waterfall_dl_clinical.png", dpi=300, bbox_inches="tight")
         plt.close()
+
 
     st.image("shap_waterfall_dl_clinical.png", caption="当前患者的 SHAP waterfall plot（对 P(group=1) 的贡献）")
