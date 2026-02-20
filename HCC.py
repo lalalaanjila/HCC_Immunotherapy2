@@ -59,8 +59,9 @@ explainer = build_shap_explainer_tree(model)
 st.title("HCC 疗效预测在线计算器（临床 + 3D DL 特征联合模型）")
 
 st.markdown("""
-本工具基于 **XGBoost 联合模型（临床 5 项 + 3D DL PCA 特征 15 项）** 对 HCC 免疫治疗再挑战疗效进行预测。  
-输出为 **P(group=1，应答/疗效较好)** 的概率，并提供个体层面 SHAP 解释（waterfall plot，适配 Streamlit Cloud）。
+本工具基于机器学习模型，对肝细胞癌（HCC）患者进行疗效（应答 vs 非应答）预测。  
+输入 **3D 深度学习特征（PCA 主成分）** 与临床变量（Alcohol、AFP、AST/ALT、Ascites、ECOG-PS）后，  
+模型输出 **P(group = 1，应答)** 的概率，并提供 **SHAP 个体解释图**。
 > ⚠️ 仅用于科研/教学，不能替代临床决策。
 """)
 
@@ -197,4 +198,5 @@ if st.button("点击进行预测"):
 
 
     st.image("shap_waterfall_dl_clinical.png", caption="当前患者的 SHAP waterfall plot（对 P(group=1) 的贡献）")
+
 
